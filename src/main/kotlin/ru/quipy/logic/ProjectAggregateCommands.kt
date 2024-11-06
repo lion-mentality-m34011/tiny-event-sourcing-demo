@@ -8,7 +8,6 @@ fun ProjectAggregateState.createProject(id: UUID, name: String): ProjectHasBeenC
     return ProjectHasBeenCreatedEvent(
         projectId = id,
         projectName = name,
-        statuses = withDefaultStatus(),
         participants = setEmptyParticipants(),
     )
 }

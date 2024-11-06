@@ -13,7 +13,6 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
 
     lateinit var projectName: String
 
-    var statuses = mutableListOf<TaskStatusEntity>()
     var participants = mutableListOf<UUID>()
 
     override fun getId() = projectId
@@ -22,7 +21,6 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     fun projectHasBeenCreatedApply(event: ProjectHasBeenCreatedEvent) {
         projectId = event.projectId
         projectName = event.projectName
-        statuses = event.statuses
         participants = event.participants
         updatedAt = event.createdAt
     }
@@ -33,22 +31,8 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         updatedAt = event.createdAt
     }
 
-    fun withDefaultStatus(): MutableList<TaskStatusEntity> {
-        return mutableListOf<TaskStatusEntity>(
-            TaskStatusEntity(
-                id = UUID.randomUUID(), name = "Created", colour = StatusColor(0, 0, 0)
-            )
-        )
-    }
-
     fun setEmptyParticipants(): MutableList<UUID> {
         return mutableListOf<UUID>()
     }
 
 }
-
-data class TaskStatusEntity(
-    val id: UUID = UUID.randomUUID(),
-    val name: String,
-    val colour: StatusColor,
-)

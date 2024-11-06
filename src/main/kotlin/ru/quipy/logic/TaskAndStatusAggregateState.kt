@@ -1,8 +1,6 @@
 package ru.quipy.logic
 
-import javassist.NotFoundException
-import ru.quipy.api.TaskAndStatusAggregate
-import ru.quipy.api.TaskHasBeenCreatedEvent
+import ru.quipy.api.*
 import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
 import java.util.*
@@ -27,9 +25,78 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
             assignees = mutableListOf(),
             statusId = event.statusId,
         )
-        updatedAt = createdAt
+        updatedAt = event.createdAt
     }
 
+    @StateTransitionFunc
+    fun userHasBeenAssignedAsAssigneeEventApply(event: UserHasBeenAssignedAsAssigneeEvent) {
+        tasks[event.taskId]!!.assignees.add(event.userId)
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun taskHasBeenRenamedEventApply(event: TaskHasBeenRenamedEvent) {
+        tasks[event.taskId]!!.name = event.taskName
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun statusHasBeenCreatedEventApply(event: StatusHasBeenCreatedEvent) {
+        taskId = event.projectId
+        println("2222222222222222222222222222 " + getId())
+        statuses[event.statusId] = StatusEntity(
+            id = event.statusId,
+            name = event.statusName,
+            statusColor = event.statusColour,
+            projectId = event.projectId,
+            order = statuses.size + 1
+        )
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun taskStatusHasBeenChangedEventApply(event: TaskStatusHasBeenChangedEvent) {
+        tasks[event.taskId]?.statusId = event.statusId
+        updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun statusDeletedApply(event: StatusHasBeenDeletedEvent) {
+
+        val orderDeletedStatus = statuses[event.statusId]!!.order
+
+        reorderStatuses(orderDeletedStatus, false)
+
+        statuses.remove(event.statusId)
+        updatedAt = event.createdAt
+    }
+
+    private fun reorderStatuses(anchor: Int, isIIncrement: Boolean) {
+        statuses.entries.forEach {
+            if (if (isIIncrement) (it.value.order > anchor) else (it.value.order <= anchor)) {
+                statuses[it.key]!!.order += 1 * (if (isIIncrement) 1 else -1)
+            }
+        }
+    }
+
+    private fun reorderStatusesWithIf(anchor: Int, newAnchor: Int, isIIncrement: Boolean) {
+        statuses.entries.forEach {
+            if (if (isIIncrement) (it.value.order in newAnchor until anchor) else (it.value.order in (anchor + 1)..newAnchor)) {
+                statuses[it.key]!!.order += 1 * (if (isIIncrement) 1 else -1)
+            }
+        }
+    }
+
+    @StateTransitionFunc
+    fun statusOrderHasBeenChangedApply(event: StatusOrderHasBeenChangedEvent) {
+        val oldOrderStatus = statuses[event.statusId]!!.order
+
+        reorderStatusesWithIf(oldOrderStatus, event.newOrder, event.newOrder < oldOrderStatus)
+
+        statuses[event.statusId]!!.order = event.newOrder
+
+        updatedAt = event.createdAt
+    }
 }
 
 
@@ -44,7 +111,8 @@ data class StatusEntity(
     val id: UUID,
     val projectId: UUID,
     val name: String,
-    val color: StatusColor,
+    val statusColor: StatusColor,
+    var order: Int
 )
 
 
