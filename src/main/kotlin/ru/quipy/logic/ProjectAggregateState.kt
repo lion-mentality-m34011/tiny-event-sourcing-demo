@@ -4,7 +4,6 @@ import ru.quipy.api.*
 import ru.quipy.core.annotations.StateTransitionFunc
 import ru.quipy.domain.AggregateState
 import java.util.*
-import kotlin.collections.mutableMapOf
 
 class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     private lateinit var projectId: UUID
@@ -34,7 +33,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         updatedAt = event.createdAt
     }
 
-    fun withDefaultStatus() : MutableList<TaskStatusEntity> {
+    fun withDefaultStatus(): MutableList<TaskStatusEntity> {
         return mutableListOf<TaskStatusEntity>(
             TaskStatusEntity(
                 id = UUID.randomUUID(), name = "Created", colour = StatusColor(0, 0, 0)
@@ -42,7 +41,7 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
         )
     }
 
-    fun setEmptyParticipants() : MutableList<UUID> {
+    fun setEmptyParticipants(): MutableList<UUID> {
         return mutableListOf<UUID>()
     }
 
