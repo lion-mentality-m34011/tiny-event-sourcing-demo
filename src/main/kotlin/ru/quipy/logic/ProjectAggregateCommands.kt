@@ -20,3 +20,10 @@ fun ProjectAggregateState.addUser(id: UUID, userId: UUID): UserHasBeenAddedEvent
         userId = userId,
     )
 }
+
+fun ProjectAggregateState.addTaskAndStatusAggregateId(id: UUID, taskAndStatusId: UUID): TaskAndStatusAggregateIDHasBeenAddedEvent {
+    return TaskAndStatusAggregateIDHasBeenAddedEvent(
+        projectId = id,
+        taskAndStatusId = taskAndStatusId,
+    )
+}

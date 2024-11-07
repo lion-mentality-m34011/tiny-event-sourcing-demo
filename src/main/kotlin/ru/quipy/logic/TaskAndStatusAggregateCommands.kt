@@ -60,6 +60,7 @@ fun TaskAndStatusAggregateState.renameTask(
 }
 
 fun TaskAndStatusAggregateState.createStatus(
+    taskAndStatusId: UUID,
     statusId: UUID,
     statusName: String,
     projectId: UUID,
@@ -72,7 +73,8 @@ fun TaskAndStatusAggregateState.createStatus(
         projectId = projectId,
         statusId = statusId,
         statusName = statusName,
-        statusColour = statusColor
+        statusColour = statusColor,
+        taskAndStatusId = taskAndStatusId,
     )
 }
 

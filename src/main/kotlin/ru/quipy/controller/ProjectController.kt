@@ -25,34 +25,25 @@ class ProjectController(
         userEsService.getState("user-aggregate-id")?.users?.get(creatorId) ?: throw NotFoundException("User has not been added")
         val project = projectEsService.create { it.createProject(UUID.randomUUID(), projectName) }
 
-        val id_ = UUID.randomUUID()
-        val a = taskEsService.create {
-            it.createStatus(id_, "CREATED", project.projectId, StatusColor(0, 0,0))
-//            it.createTask(UUID.randomUUID(), "1111", project.projectId, id_)
+        val aggregateId = UUID.randomUUID()
+        taskEsService.create {
+            it.createStatus(aggregateId, UUID.randomUUID(), "CREATED", project.projectId, StatusColor(0, 0,0))
         }
-        val b = taskEsService.create {
-            it.createStatus(id_, "CREATED", project.projectId, StatusColor(0, 0,0))
-        }
-
-        println(a.projectId)
-        println(taskEsService.getState(a.projectId))
-        println(taskEsService.getState(a.id))
-        println(taskEsService.getState(a.statusId))
-
-
-//        taskAndStatusEsService.update(project.projectId) {
-//            it.createStatus(UUID.randomUUID(), "CREATED", project.projectId, StatusColor(0, 0,0))
-//        }
 
         projectEsService.update(project.projectId) {
             it.addUser(id = project.projectId, userId = creatorId)
         }
 
+        projectEsService.update(project.projectId) {
+            it.addTaskAndStatusAggregateId(id = project.projectId, taskAndStatusId = aggregateId)
+        }
+
+
         return project
     }
 
     @GetMapping("/{projectId}")
-    fun getAccount(@PathVariable projectId: UUID) : ProjectAggregateState? {
+    fun getProject(@PathVariable projectId: UUID) : ProjectAggregateState? {
         return projectEsService.getState(projectId)
     }
 

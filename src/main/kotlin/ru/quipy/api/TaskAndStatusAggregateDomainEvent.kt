@@ -30,6 +30,7 @@ class TaskHasBeenCreatedEvent(
 
 @DomainEvent(name = STATUS_HAS_BEEN_CREATED_EVENT)
 class StatusHasBeenCreatedEvent(
+    val taskAndStatusId: UUID,
     val projectId: UUID,
     val statusId: UUID,
     val statusName: String,

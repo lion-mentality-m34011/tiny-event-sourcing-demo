@@ -7,14 +7,15 @@ import java.util.*
 
 
 class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate> {
-    private lateinit var taskId: UUID
+    private lateinit var taskAndStatusId: UUID
+    private lateinit var projectId: UUID
     var statuses = mutableMapOf<UUID, StatusEntity>()
     var tasks = mutableMapOf<UUID, TaskEntity>()
 
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
 
-    override fun getId() = taskId
+    override fun getId() = taskAndStatusId
 
     @StateTransitionFunc
     fun taskCreatedApply(event: TaskHasBeenCreatedEvent) {
@@ -42,7 +43,11 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
 
     @StateTransitionFunc
     fun statusHasBeenCreatedEventApply(event: StatusHasBeenCreatedEvent) {
-        taskId = event.projectId
+        if (!this::taskAndStatusId.isInitialized) {
+            taskAndStatusId = event.taskAndStatusId
+            createdAt = event.createdAt
+        }
+        projectId = event.projectId
         println("2222222222222222222222222222 " + getId())
         statuses[event.statusId] = StatusEntity(
             id = event.statusId,

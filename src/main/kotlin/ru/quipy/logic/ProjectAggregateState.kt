@@ -7,6 +7,7 @@ import java.util.*
 
 class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     private lateinit var projectId: UUID
+    lateinit var taskAndStatusId: UUID
 
     var createdAt: Long = System.currentTimeMillis()
     var updatedAt: Long = System.currentTimeMillis()
@@ -29,6 +30,11 @@ class ProjectAggregateState : AggregateState<UUID, ProjectAggregate> {
     fun userHasBeenAddedEventApply(event: UserHasBeenAddedEvent) {
         participants.add(event.userId)
         updatedAt = event.createdAt
+    }
+
+    @StateTransitionFunc
+    fun taskAndStatusAggregateIDHasBeenAddedEventApply(event: TaskAndStatusAggregateIDHasBeenAddedEvent) {
+        taskAndStatusId = event.taskAndStatusId
     }
 
     fun setEmptyParticipants(): MutableList<UUID> {

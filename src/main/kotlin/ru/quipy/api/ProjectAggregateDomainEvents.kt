@@ -6,6 +6,7 @@ import java.util.*
 
 const val PROJECT_HAS_BEEN_CREATED = "PROJECT_HAS_BEEN_CREATED"
 const val USER_HAS_BEEN_ADDED_EVENT = "USER_HAS_BEEN_ADDED_EVENT"
+const val TASK_AND_STATUS_AGGREGATE_ID_HAS_BEEN_ADDED_EVENT = "TASK_AND_STATUS_AGGREGATE_ID_HAS_BEEN_ADDED_EVENT"
 
 
 @DomainEvent(name = PROJECT_HAS_BEEN_CREATED)
@@ -26,6 +27,18 @@ class UserHasBeenAddedEvent(
     val userId: UUID,
     createdAt: Long = System.currentTimeMillis(),
 ) : Event<ProjectAggregate>(
-    name = USER_HAS_BEEN_ADDED_EVENT, createdAt = createdAt
+    name = USER_HAS_BEEN_ADDED_EVENT,
+    createdAt = createdAt
 )
+
+@DomainEvent(name = TASK_AND_STATUS_AGGREGATE_ID_HAS_BEEN_ADDED_EVENT)
+class TaskAndStatusAggregateIDHasBeenAddedEvent(
+    val projectId: UUID,
+    val taskAndStatusId: UUID,
+    createdAt: Long = System.currentTimeMillis(),
+) : Event<ProjectAggregate>(
+    name = TASK_AND_STATUS_AGGREGATE_ID_HAS_BEEN_ADDED_EVENT,
+    createdAt = createdAt
+)
+
 
