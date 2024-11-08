@@ -1,4 +1,4 @@
-package com.example.errorhandling
+package ru.quipy.controller
 
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
