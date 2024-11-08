@@ -38,12 +38,11 @@ class UserControllerTests {
             "password"
         )
 
-        try {
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
             userCtrl.createUser(
                 login,
                 "password"
             )
-        } catch (_: IllegalArgumentException) {
         }
     }
 }

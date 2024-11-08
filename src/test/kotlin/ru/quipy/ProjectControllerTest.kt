@@ -1,5 +1,6 @@
 package ru.quipy
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -56,9 +57,8 @@ class ProjectControllerTest {
         val user = createNewUser()
         val project = projectCtrl.createProject("New Project", user.userId)
 
-        try {
+        Assertions.assertThrows(IllegalArgumentException::class.java) {
             projectCtrl.addParticipant(project.projectId, user.userId)
-        } catch (_: IllegalArgumentException) {
         }
     }
 

@@ -1,5 +1,6 @@
 package ru.quipy
 
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
@@ -11,6 +12,7 @@ import ru.quipy.controller.ProjectController
 import ru.quipy.controller.TaskAndStatusController
 import ru.quipy.controller.UserController
 import ru.quipy.logic.StatusColor
+import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.util.UUID
 
@@ -87,9 +89,8 @@ class TaskAndStatusControllerTests {
 
 
         taskAndStatusCtrl.createTask("test", project.projectId, statusId)
-        try {
+        Assertions.assertThrows(IllegalStateException::class.java) {
             taskAndStatusCtrl.deleteStatus(project.projectId,statusId)
-        } catch (_: IllegalStateException){
         }
     }
 
