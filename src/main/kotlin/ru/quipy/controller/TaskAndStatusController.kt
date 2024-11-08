@@ -54,10 +54,6 @@ class TaskAndStatusController(
         @RequestParam statusId: UUID,
     ) : StatusHasBeenDeletedEvent {
         val project = projectEsService.getState(projectId)?: throw NotFoundException("Project does not exist.")
-        val taskAndStatus = taskEsService.getState(project.taskAndStatusId)
-
-        if (!taskAndStatus!!.statuses.containsKey(statusId))
-            throw NotFoundException("Status does not exist.")
 
         return taskEsService.update(project.taskAndStatusId) {
             it.deleteStatus(statusId)
@@ -71,10 +67,6 @@ class TaskAndStatusController(
         @RequestParam newOrder: Int,
     ) : StatusOrderHasBeenChangedEvent {
         val project = projectEsService.getState(projectId)?: throw NotFoundException("Project does not exist.")
-        val taskAndStatus = taskEsService.getState(project.taskAndStatusId)
-
-        if (!taskAndStatus!!.statuses.containsKey(statusId))
-            throw NotFoundException("Status does not exist.")
 
         return taskEsService.update(project.taskAndStatusId) {
             it.changeStatusOrder(statusId,newOrder)
@@ -88,13 +80,6 @@ class TaskAndStatusController(
         @RequestParam taskId: UUID,
     ) : UserHasBeenAssignedAsAssigneeEvent {
         val project = projectEsService.getState(projectId)?: throw NotFoundException("Project does not exist.")
-        val taskAndStatus = taskEsService.getState(project.taskAndStatusId)
-
-        if (project.participants.firstOrNull { it == userId } == null)
-            throw NotFoundException("Project assignee does not exist.")
-
-        if (!taskAndStatus!!.tasks.containsKey(taskId))
-            throw NotFoundException("Task does not exist.")
 
         return taskEsService.update(project.taskAndStatusId) {
             it.addAssignee(taskId, userId)
@@ -108,13 +93,6 @@ class TaskAndStatusController(
         @RequestParam statusId: UUID,
     ) : TaskStatusHasBeenChangedEvent {
         val project = projectEsService.getState(projectId)?: throw NotFoundException("Project does not exist.")
-        val taskAndStatus = taskEsService.getState(project.taskAndStatusId)
-
-        if (!taskAndStatus!!.statuses.containsKey(statusId))
-            throw NotFoundException("Status does not exist.")
-
-        if (!taskAndStatus.tasks.containsKey(taskId))
-            throw NotFoundException("Task does not exist.")
 
         return taskEsService.update(project.taskAndStatusId) {
             it.changeStatus(taskId, statusId)
@@ -128,10 +106,6 @@ class TaskAndStatusController(
         @RequestParam newName: String,
     ) : TaskHasBeenRenamedEvent {
         val project = projectEsService.getState(projectId)?: throw NotFoundException("Project does not exist.")
-        val taskAndStatus = taskEsService.getState(project.taskAndStatusId)
-
-        if (!taskAndStatus!!.tasks.containsKey(taskId))
-            throw NotFoundException("Task does not exist.")
 
         return taskEsService.update(project.taskAndStatusId) {
             it.renameTask(taskId, newName)

@@ -46,7 +46,7 @@ fun TaskAndStatusAggregateState.renameTask(
     taskId: UUID,
     taskName: String
 ): TaskHasBeenRenamedEvent {
-    val task = tasks[taskId] ?: throw IllegalArgumentException("Task not found.")
+    tasks[taskId] ?: throw IllegalArgumentException("Task not found.")
 
     if (taskName == "") {
         throw IllegalArgumentException("Task name is empty.")
