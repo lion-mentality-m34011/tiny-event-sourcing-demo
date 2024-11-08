@@ -11,6 +11,7 @@ import ru.quipy.controller.ProjectController
 import ru.quipy.controller.TaskAndStatusController
 import ru.quipy.controller.UserController
 import ru.quipy.logic.StatusColor
+import java.lang.IllegalStateException
 import java.util.UUID
 
 @SpringBootTest
@@ -75,6 +76,21 @@ class TaskAndStatusControllerTests {
         assertEquals(1, lastStatus.order)
         assertEquals("test", lastStatus.name)
         assertEquals(StatusColor(1, 1,1), lastStatus.statusColor)
+    }
+
+    @Test
+    fun failDeleteStatus() {
+        val user = createNewUser()
+        val project = createNewProject(user.userId)
+        val aggregateObj = taskAndStatusCtrl.getState(project.projectId)
+        val statusId = aggregateObj!!.statuses.values.first().id
+
+
+        taskAndStatusCtrl.createTask("test", project.projectId, statusId)
+        try {
+            taskAndStatusCtrl.deleteStatus(project.projectId,statusId)
+        } catch (_: IllegalStateException){
+        }
     }
 
 

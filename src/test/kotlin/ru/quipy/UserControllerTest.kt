@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import ru.quipy.controller.UserController
+import java.lang.IllegalArgumentException
 import java.util.*
 
 @SpringBootTest
@@ -14,7 +15,7 @@ class UserControllerTests {
     private lateinit var userCtrl: UserController
 
     @Test
-    fun getUser() {
+    fun createUser() {
         val login = UUID.randomUUID().toString()
         val user = userCtrl.createUser(
             login,
@@ -27,5 +28,22 @@ class UserControllerTests {
         Assertions.assertNotNull(response)
         Assertions.assertEquals(login, response!!.login)
         Assertions.assertEquals("password", response.password)
+    }
+
+    @Test
+    fun failCreateUser() {
+        val login = UUID.randomUUID().toString()
+        userCtrl.createUser(
+            login,
+            "password"
+        )
+
+        try {
+            userCtrl.createUser(
+                login,
+                "password"
+            )
+        } catch (_: IllegalArgumentException) {
+        }
     }
 }
