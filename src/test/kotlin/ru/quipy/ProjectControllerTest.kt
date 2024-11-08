@@ -9,6 +9,7 @@ import ru.quipy.api.UserHasBeenCreatedEvent
 import ru.quipy.controller.ProjectController
 import java.util.*
 import ru.quipy.controller.UserController
+import java.lang.IllegalArgumentException
 
 @SpringBootTest
 class ProjectControllerTest {
@@ -48,6 +49,17 @@ class ProjectControllerTest {
         assertNotNull(addedUser)
         assertEquals(newUser.userId, addedUser)
         assertEquals(2, updatedProject.participants.size)
+    }
+
+    @Test
+    fun addExistedUser() {
+        val user = createNewUser()
+        val project = projectCtrl.createProject("New Project", user.userId)
+
+        try {
+            projectCtrl.addParticipant(project.projectId, user.userId)
+        } catch (_: IllegalArgumentException) {
+        }
     }
 
     private fun createNewUser(): UserHasBeenCreatedEvent {
