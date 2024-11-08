@@ -11,19 +11,19 @@ import java.util.*
 class UserControllerTests {
 
     @Autowired
-    private lateinit var userController: UserController
+    private lateinit var userCtrl: UserController
 
     @Test
     fun getUser() {
         val login = UUID.randomUUID().toString()
-        val user = userController.createUser(
+        val user = userCtrl.createUser(
             login,
             "password"
         )
         Assertions.assertEquals(login, user.login)
         Assertions.assertEquals("password", user.password)
 
-        val response = userController.getAccount(user.userId)
+        val response = userCtrl.getAccount(user.userId)
         Assertions.assertNotNull(response)
         Assertions.assertEquals(login, response!!.login)
         Assertions.assertEquals("password", response.password)

@@ -48,7 +48,6 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
             createdAt = event.createdAt
         }
         projectId = event.projectId
-        println("2222222222222222222222222222 " + getId())
         statuses[event.statusId] = StatusEntity(
             id = event.statusId,
             name = event.statusName,
@@ -78,7 +77,7 @@ class TaskAndStatusAggregateState : AggregateState<UUID, TaskAndStatusAggregate>
 
     private fun reorderStatuses(anchor: Int, isIIncrement: Boolean) {
         statuses.entries.forEach {
-            if (if (isIIncrement) (it.value.order > anchor) else (it.value.order <= anchor)) {
+            if (if (!isIIncrement) (it.value.order > anchor) else (it.value.order <= anchor)) {
                 statuses[it.key]!!.order += 1 * (if (isIIncrement) 1 else -1)
             }
         }

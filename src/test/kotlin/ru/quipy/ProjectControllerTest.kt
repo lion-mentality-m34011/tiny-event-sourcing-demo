@@ -21,10 +21,10 @@ class ProjectControllerTest {
 
     @Test
     fun should_create_project_and_add_participant_successfully() {
-        val owner = createNewUser()
+        val creator = createNewUser()
         val newUser = createNewUser()
 
-        val createdProject = projectCtrl.createProject("New Project", owner.userId)
+        val createdProject = projectCtrl.createProject("New Project", creator.userId)
 
         assertEquals(1, createdProject.version)
         assertEquals("New Project", createdProject.projectName)
@@ -32,10 +32,10 @@ class ProjectControllerTest {
         val retrievedProject = projectCtrl.getProject(createdProject.projectId)
         assertNotNull(retrievedProject)
 
-        val projectOwner = retrievedProject!!.participants.firstOrNull { it == owner.userId }
+        val projectOwner = retrievedProject!!.participants.firstOrNull { it == creator.userId }
         assertNotNull(projectOwner)
         assertEquals("New Project", retrievedProject.projectName)
-        assertEquals(owner.userId, projectOwner)
+        assertEquals(creator.userId, projectOwner)
         assertEquals(1, retrievedProject.participants.size)
 
         assertEquals(null, retrievedProject.participants.firstOrNull { it == newUser.userId })

@@ -17,7 +17,6 @@ fun TaskAndStatusAggregateState.createTask(
         throw IllegalArgumentException("Name already exists.")
     }
 
-    println(statuses)
     if (!statuses.containsKey(statusId)) {
         throw IllegalArgumentException("Status does not exists.")
     }
@@ -68,7 +67,6 @@ fun TaskAndStatusAggregateState.createStatus(
     if (statuses.values.any { t -> t.name == statusName }) {
         throw IllegalArgumentException("Status already exists.")
     }
-    println("HOHOHOHOHOHOHOHOOHHOOHOOHOHOHOHOHOH " + projectId + " " + statusId + " " + statusName + " ")
     return StatusHasBeenCreatedEvent(
         projectId = projectId,
         statusId = statusId,
@@ -109,7 +107,7 @@ fun TaskAndStatusAggregateState.changeStatusOrder(
         throw IllegalArgumentException("Status does not exist.")
 
 
-    if (order >= 0 && order < statuses.size)
+    if (order > 0 && order <= statuses.size)
         return StatusOrderHasBeenChangedEvent(
             statusId = statusId,
             newOrder = order,

@@ -26,9 +26,9 @@ class TaskAndStatusController(
         @RequestParam projectId: UUID,
         @RequestParam statusId: UUID,
     ) : TaskHasBeenCreatedEvent {
-        projectEsService.getState(projectId)?: throw NotFoundException("Project does not exist.")
+        val project = projectEsService.getState(projectId)?: throw NotFoundException("Project does not exist.")
 
-        return taskEsService.update(projectId) {
+        return taskEsService.update(project.taskAndStatusId) {
             it.createTask(UUID.randomUUID(), taskName, projectId, statusId)
         }
     }
