@@ -12,7 +12,6 @@ import ru.quipy.controller.ProjectController
 import ru.quipy.controller.TaskAndStatusController
 import ru.quipy.controller.UserController
 import ru.quipy.logic.StatusColor
-import java.lang.IllegalArgumentException
 import java.lang.IllegalStateException
 import java.util.UUID
 
