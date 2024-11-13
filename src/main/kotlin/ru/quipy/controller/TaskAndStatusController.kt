@@ -11,13 +11,18 @@ import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
+import ru.quipy.projections.ProjectMembers
+import ru.quipy.projections.ProjectMembersProjection
+import ru.quipy.projections.Task
+import ru.quipy.projections.TaskProjection
 import java.util.*
 
 @RestController
 @RequestMapping("/taskAndStatus")
 class TaskAndStatusController(
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
-    val taskEsService: EventSourcingService<UUID, TaskAndStatusAggregate, TaskAndStatusAggregateState>
+    val taskEsService: EventSourcingService<UUID, TaskAndStatusAggregate, TaskAndStatusAggregateState>,
+    val taskProjection: TaskProjection,
 ) {
 
     @PostMapping("/task/{taskName}")
@@ -112,11 +117,15 @@ class TaskAndStatusController(
         }
     }
 
-
     @GetMapping("/{projectId}")
     fun getState(@PathVariable projectId: UUID) : TaskAndStatusAggregateState? {
         val project = projectEsService.getState(projectId)?: throw NotFoundException("Project does not exist.")
         return taskEsService.getState(project.taskAndStatusId)
+    }
+
+    @GetMapping("/projection/task/{taskId}")
+    fun getTaskProjection(@PathVariable taskId: UUID) : Task {
+        return taskProjection.getById(taskId) ?: throw NotFoundException("Task does not exists")
     }
 }
 

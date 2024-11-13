@@ -1,6 +1,7 @@
 package ru.quipy.controller
 
 import javassist.NotFoundException
+import liquibase.pro.packaged.it
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -10,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
+import ru.quipy.projections.*
 import java.util.*
 
 @RestController
@@ -17,12 +19,16 @@ import java.util.*
 class ProjectController(
     val projectEsService: EventSourcingService<UUID, ProjectAggregate, ProjectAggregateState>,
     val userEsService: EventSourcingService<String, UserAggregate, UserAggregateState>,
-    val taskEsService: EventSourcingService<UUID, TaskAndStatusAggregate, TaskAndStatusAggregateState>
+    val taskEsService: EventSourcingService<UUID, TaskAndStatusAggregate, TaskAndStatusAggregateState>,
+    val projectProjection: ProjectProjection,
+    val projectMembersProjection: ProjectMembersProjection,
+    val projectTasksProjection: ProjectTasksProjection,
 ) {
 
     @PostMapping("/{projectName}")
     fun createProject(@PathVariable projectName: String, @RequestParam creatorId: UUID) : ProjectHasBeenCreatedEvent {
         userEsService.getState("user-aggregate-id")?.users?.get(creatorId) ?: throw NotFoundException("User has not been added")
+
         val project = projectEsService.create { it.createProject(UUID.randomUUID(), projectName) }
 
         val aggregateId = UUID.randomUUID()
@@ -54,6 +60,21 @@ class ProjectController(
     ): UserHasBeenAddedEvent {
        userEsService.getState("user-aggregate-id")?.users?.get(userId) ?: throw NotFoundException("User does not exists")
         return projectEsService.update(projectId) { it.addUser(id = projectId, userId = userId) }
+    }
+
+    @GetMapping("/projection/project/{projectId}")
+    fun getProjectProjection(@PathVariable projectId: UUID) : Project {
+        return projectProjection.getById(projectId) ?: throw NotFoundException("Project does not exists")
+    }
+
+    @GetMapping("/projection/members/{projectId}")
+    fun getProjectMembersProjection(@PathVariable projectId: UUID) : ProjectMembers {
+        return projectMembersProjection.getById(projectId) ?: throw NotFoundException("Project does not exists")
+    }
+
+    @GetMapping("/projection/prject_tasks/{projectId}")
+    fun getProjectTasksProjection(@PathVariable projectId: UUID) : ProjectTasks {
+        return projectTasksProjection.getById(projectId) ?: throw NotFoundException("Project does not exists")
     }
 }
 
