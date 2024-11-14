@@ -11,8 +11,6 @@ import org.springframework.web.bind.annotation.RestController
 import ru.quipy.api.*
 import ru.quipy.core.EventSourcingService
 import ru.quipy.logic.*
-import ru.quipy.projections.ProjectMembers
-import ru.quipy.projections.ProjectMembersProjection
 import ru.quipy.projections.Task
 import ru.quipy.projections.TaskProjection
 import java.util.*

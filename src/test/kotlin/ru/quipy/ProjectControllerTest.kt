@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
 import ru.quipy.api.UserHasBeenCreatedEvent
 import ru.quipy.controller.ProjectController
+import ru.quipy.controller.TaskAndStatusController
 import java.util.*
 import ru.quipy.controller.UserController
 import java.lang.IllegalArgumentException
@@ -20,6 +21,9 @@ class ProjectControllerTest {
 
     @Autowired
     private lateinit var projectCtrl: ProjectController
+
+    @Autowired
+    private lateinit var taskAndStatusCtrl: TaskAndStatusController
 
     @Test
     fun should_create_project_and_add_participant_successfully() {
@@ -60,6 +64,48 @@ class ProjectControllerTest {
         Assertions.assertThrows(IllegalArgumentException::class.java) {
             projectCtrl.addParticipant(project.projectId, user.userId)
         }
+    }
+
+    @Test
+    fun getProjectProjection() {
+        val user = createNewUser()
+        val project = projectCtrl.createProject("New Project", user.userId)
+
+        Thread.sleep(5_000)
+
+        val projectProjection = projectCtrl.getProjectProjection(project.projectId)
+        assertNotNull(projectProjection)
+        assertEquals(project.projectId, projectProjection.projectId)
+        assertEquals("New Project", projectProjection.name)
+    }
+
+    @Test
+    fun getProjectMembersProjection() {
+        val user = createNewUser()
+        val project = projectCtrl.createProject("New Project", user.userId)
+
+        Thread.sleep(5_000)
+
+        val projectProjection = projectCtrl.getProjectMembersProjection(project.projectId)
+        assertNotNull(projectProjection)
+        assertEquals(project.projectId, projectProjection.projectId)
+        Assertions.assertTrue(projectProjection.members.contains(user.userId))
+    }
+
+    @Test
+    fun getProjectTasksProjection() {
+        val user = createNewUser()
+        val project = projectCtrl.createProject("New Project", user.userId)
+        val aggregateObj = taskAndStatusCtrl.getState(project.projectId)
+        val statusId = aggregateObj!!.statuses.values.first().id
+        val task = taskAndStatusCtrl.createTask("test", project.projectId, statusId)
+
+        Thread.sleep(5_000)
+
+        val projectProjection = projectCtrl.getProjectTasksProjection(project.projectId)
+        assertNotNull(projectProjection)
+        assertEquals(project.projectId, projectProjection.projectId)
+        Assertions.assertTrue(projectProjection.tasks.contains(task.taskId))
     }
 
     private fun createNewUser(): UserHasBeenCreatedEvent {

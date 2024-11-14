@@ -174,6 +174,25 @@ class TaskAndStatusControllerTests {
         assertEquals("test1", renamedTask.taskName)
     }
 
+    @Test
+    fun getTaskProjection() {
+        val user = createNewUser()
+        val project = projectCtrl.createProject("New Project", user.userId)
+        val aggregateObj = taskAndStatusCtrl.getState(project.projectId)
+        val statusId = aggregateObj!!.statuses.values.first().id
+        val task = taskAndStatusCtrl.createTask("test", project.projectId, statusId)
+        taskAndStatusCtrl.addAssignee(project.projectId, user.userId, task.taskId)
+
+        Thread.sleep(5_000)
+
+        val taskProjection = taskAndStatusCtrl.getTaskProjection(task.taskId)
+        assertNotNull(taskProjection)
+        assertEquals(task.taskId, taskProjection.taskId)
+        assertEquals("test", taskProjection.name)
+        Assertions.assertTrue(taskProjection.assignee.contains(user.userId))
+        assertEquals(statusId, taskProjection.statusId)
+    }
+
     private fun createNewUser(): UserHasBeenCreatedEvent {
         return userCtrl.createUser(
             UUID.randomUUID().toString(),

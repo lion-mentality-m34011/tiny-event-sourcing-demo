@@ -48,7 +48,7 @@ class UserController(
     }
 
     @GetMapping("/projection/user/")
-    fun getUserProjectsProjection(
+    fun getUserID(
         @RequestParam(required = true, value = "login") login: String,
         @RequestParam(required = true, value = "password") password: String
     ) : UUID {
