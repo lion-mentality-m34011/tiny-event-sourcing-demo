@@ -1,15 +1,17 @@
 package ru.quipy
 
+import org.awaitility.Awaitility
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.repository.findByIdOrNull
 import ru.quipy.controller.ProjectController
 import ru.quipy.controller.UserController
-import ru.quipy.projections.UserProjection
-import ru.quipy.streams.AggregateSubscriptionsManager
-import java.lang.IllegalArgumentException
+import ru.quipy.projections.UserProjectsRepository
+import ru.quipy.projections.UserRepository
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 class UserControllerTests {
@@ -21,7 +23,10 @@ class UserControllerTests {
     private lateinit var projectCtrl: ProjectController
 
     @Autowired
-    private lateinit var userProjection : UserProjection
+    private lateinit var userProjectsRepository: UserProjectsRepository
+
+    @Autowired
+    private lateinit var userRepository: UserRepository
 
     @Test
     fun createUser() {
@@ -65,7 +70,10 @@ class UserControllerTests {
 
         val project = projectCtrl.createProject("New Project", user.userId)
 
-        Thread.sleep(5_000)
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).untilAsserted {
+            val userProjects = userProjectsRepository.findByIdOrNull(user.userId)
+            Assertions.assertTrue(userProjects?.projects?.contains(project.projectId) ?: false)
+        }
 
         val userProjects = userCtrl.getUserProjectsProjection(user.userId)
         Assertions.assertNotNull(userProjects)
@@ -81,7 +89,7 @@ class UserControllerTests {
             "password"
         )
 
-        Thread.sleep(5_000)
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).untilAsserted { Assertions.assertEquals(user.userId, userRepository.findByIdOrNull(user.userId)?.userId) }
 
         val userID = userCtrl.getUserID(login, "password")
         Assertions.assertNotNull(user)

@@ -31,7 +31,7 @@ class ProjectTasksProjection (
         }
         subscriptionsManager.createSubscriber(TaskAndStatusAggregate::class, "task-and-status::project-tasks-projection") {
             `when`(TaskHasBeenCreatedEvent::class) { event ->
-                var project = projectTasksRepository.findByIdOrNull(event.projectId) ?: throw NotFoundException("Project does not exists")
+                val project = projectTasksRepository.findByIdOrNull(event.projectId) ?: throw NotFoundException("Project does not exists")
                 project.tasks.add(event.taskId)
                 projectTasksRepository.save(project)
                 logger.info("task-and-status::project-tasks-projection ${event.projectId}")

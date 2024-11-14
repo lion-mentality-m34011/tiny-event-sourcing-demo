@@ -1,19 +1,23 @@
 package ru.quipy
 
+import org.awaitility.Awaitility
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.repository.findByIdOrNull
 import ru.quipy.api.ProjectHasBeenCreatedEvent
 import ru.quipy.api.UserHasBeenCreatedEvent
 import ru.quipy.controller.ProjectController
 import ru.quipy.controller.TaskAndStatusController
 import ru.quipy.controller.UserController
 import ru.quipy.logic.StatusColor
+import ru.quipy.projections.TaskRepository
 import java.lang.IllegalStateException
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 
 @SpringBootTest
 class TaskAndStatusControllerTests {
@@ -26,6 +30,9 @@ class TaskAndStatusControllerTests {
 
     @Autowired
     private lateinit var taskAndStatusCtrl: TaskAndStatusController
+
+    @Autowired
+    private lateinit var taskRepository: TaskRepository
 
     @Test
     fun createTask() {
@@ -183,7 +190,10 @@ class TaskAndStatusControllerTests {
         val task = taskAndStatusCtrl.createTask("test", project.projectId, statusId)
         taskAndStatusCtrl.addAssignee(project.projectId, user.userId, task.taskId)
 
-        Thread.sleep(5_000)
+        Awaitility.await().timeout(10, TimeUnit.SECONDS).untilAsserted {
+            val t = taskRepository.findByIdOrNull(task.taskId)
+            Assertions.assertTrue(t?.assignee?.contains(user.userId) ?: false)
+        }
 
         val taskProjection = taskAndStatusCtrl.getTaskProjection(task.taskId)
         assertNotNull(taskProjection)
